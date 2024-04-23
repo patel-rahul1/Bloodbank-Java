@@ -12,27 +12,28 @@
 # WORKDIR /app
 # CMD ["java","-jar","service.jar"]
 # Use the base Maven image
-FROM adoptopenjdk/openjdk17:alpine AS builder
+# Use the official Maven image as the builder stage
+FROM maven:3.9.5-openjdk-17-slim AS builder
 
-# Set up Maven
-ENV MAVEN_VERSION 3.9.5
-ENV MAVEN_HOME /usr/share/maven
-ENV MAVEN_URL https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.zip
-
-# Install necessary tools
-RUN apk --no-cache add curl && \
-    curl -fsSL -o /tmp/apache-maven.zip ${MAVEN_URL} && \
-    unzip -d /usr/share/maven /tmp/apache-maven.zip && \
-    ln -s ${MAVEN_HOME}/bin/mvn /usr/bin/mvn && \
-    rm -f /tmp/apache-maven.zip
-
-# Copy the project files and build
+# Copy the project files into the container
 COPY . /app
 WORKDIR /app
+
+# Build the project using Maven
 RUN mvn clean package -DskipTests
 
-# Package stage
+# Use a lightweight base image for the final stage
 FROM adoptopenjdk/openjdk17:alpine-jre
-COPY --from=builder /app/target/service-1.0-SNAPSHOT.jar /app/service.jar
+
+# Set the working directory in the container
 WORKDIR /app
-CMD ["java", "-jar", "service.jar"]
+
+# Copy the JAR file from the builder stage to the final stage
+COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar /app/demo.jar
+
+# Expose the port that the application runs on
+EXPOSE 8080
+
+# Specify the command to run the application
+CMD ["java", "-jar", "demo.jar"]
+
