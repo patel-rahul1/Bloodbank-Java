@@ -13,7 +13,8 @@
 # CMD ["java","-jar","service.jar"]
 # Use the base Maven image
 # Use the official Maven image as the builder stage
-FROM maven:3.9.5-openjdk-17-slim AS builder
+# Use the official Maven image as the builder stage
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 # Copy the project files into the container
 COPY . /app
@@ -36,4 +37,5 @@ EXPOSE 8080
 
 # Specify the command to run the application
 CMD ["java", "-jar", "demo.jar"]
+
 
