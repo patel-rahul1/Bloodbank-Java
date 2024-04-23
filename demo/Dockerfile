@@ -14,6 +14,7 @@
 # Use the base Maven image
 # Use the official Maven image as the builder stage
 # Use the official Maven image as the builder stage
+# Use the official Maven image as the builder stage
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 # Copy the project files into the container
@@ -24,7 +25,7 @@ WORKDIR /app
 RUN mvn clean package -DskipTests
 
 # Use a lightweight base image for the final stage
-FROM adoptopenjdk/openjdk17:alpine-jre
+FROM openjdk:17-alpine
 
 # Set the working directory in the container
 WORKDIR /app
@@ -37,5 +38,4 @@ EXPOSE 8080
 
 # Specify the command to run the application
 CMD ["java", "-jar", "demo.jar"]
-
 
